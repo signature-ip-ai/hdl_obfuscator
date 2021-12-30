@@ -13,6 +13,7 @@
 
     <target name="clean">
         <delete dir="${dir.build}"/>
+        <delete dir="${dir.src.generated}"/>
     </target>
 
     <target name="generate_map_reader">
