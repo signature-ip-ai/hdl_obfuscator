@@ -1,27 +1,26 @@
 // ----------------------------------------------------------
 // Module: nc_test_1
 // ----------------------------------------------------------
-module nc_test_1 
+module nc_test_1
 (
 	// input ports
-	i1,
-	i2,
+	input1,
+	input2,
 	// output ports
-	o1,
-	o2 
+	output1,
+	output2
 );
-	
+
 	// input ports
-	input i1;
-	input i2;
-	
+	input input1;
+	input input2;
+
 	// output ports
-	output o1;
-	output o2;
+	output output1;
+	output output2;
 
 
-	assign o1 = i1 & i2;
-	assign o2 = ^{i1,i2};
-	 
+	assign output1 = input1 & input2;
+	assign output2 = ^{input1,input2};
+
 endmodule // verilogtest_1
-
