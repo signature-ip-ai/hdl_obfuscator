@@ -371,7 +371,6 @@ LELELEEQ                         : "<<<="                ;
 GTGTGTEQ                         : ">>>="                ;
 MINUSCOLON                       : "-:"                  ;
 PLUSCOLON                        : "+:"                  ;
-APOSTROPHE                       : "'"                   ;
 
 
 
@@ -405,12 +404,14 @@ protected  UNSIZED_NUMBER   : DIGIT (DIGIT | '_')* ( '.' (DIGIT | '_')* )? (EXPO
 protected  DIGIT            : ('0'..'9');
 protected  HEXDIGIT         : ('A'..'F'|'a'..'f');
 protected  EXPONENT         : ('e'|'E') ('+'|'-')? ('0'..'9')+;
+protected  CONST_LITERAL    : '\'' SIZED_DIGIT (SIZED_DIGIT | '_')* ;
 
 NUMBER
         :
           ((SIZE)? ('_' | '.' | EXPONENT))  => UNSIZED_NUMBER
         | ((SIZE)? BASE)                    => SIZED_NUMBER
         | SIZE
+        | CONST_LITERAL
         ;
 
 
