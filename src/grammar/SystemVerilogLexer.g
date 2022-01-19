@@ -36,7 +36,7 @@ class SystemVerilogNoSkipLexer extends Lexer;
 options {
     exportVocab = SystemVerilogNoSkip;  // call the vocabulary "SystemVerilogNoSkip"
     testLiterals = false;               // don't automatically test for literals
-    k = 6;                              //6   
+    k = 6;                              //6
 }
 
 
@@ -371,6 +371,7 @@ LELELEEQ                         : "<<<="                ;
 GTGTGTEQ                         : ">>>="                ;
 MINUSCOLON                       : "-:"                  ;
 PLUSCOLON                        : "+:"                  ;
+APOSTROPHE                       : "'"                   ;
 
 
 
