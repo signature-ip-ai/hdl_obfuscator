@@ -323,7 +323,6 @@ FORWARD                          : '\\'                  ;
 TRIGGER                          : "->"                  ;
 PPATH                            : "=>"                  ;
 FPATH                            : "*>"                  ;
-SPECIAL_BKT_DOT_STAR_BKT_SPECIAL : "(.*)"                ;
 COLONEQ                          : ":="                  ;
 COLONDIV                         : ":/"                  ;
 COLONCOLON                       : "::"                  ;
