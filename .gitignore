@@ -24,4 +24,4 @@ hs_err_pid*
 
 # Directories
 build/
-src/generated/
+target
