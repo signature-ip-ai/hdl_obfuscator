@@ -82,7 +82,7 @@ class Obfuscator {
 
     public void sysVeriObfuscate(String mapFile, String inFile, String outFile) {
         try {
-            final var sysVeriObfuscator = SystemVerilogObfuscator.create(mapFile, inFile, outFile);
+            final var sysVeriObfuscator = SystemVerilogObfuscatorv4.create(mapFile, inFile, outFile);
             sysVeriObfuscator.generateObfuscatedFile();
 
         } catch (ObfuscatorException exception) {
@@ -92,7 +92,7 @@ class Obfuscator {
 
     public void vhdlObfuscate(String mapFile, String inFile, String outFile) {
         try {
-            final var vhdlObfuscator = VhdlObfuscator.create(mapFile, inFile, outFile);
+            final var vhdlObfuscator = VhdlObfuscatorv4.create(mapFile, inFile, outFile);
             vhdlObfuscator.generateObfuscatedFile();
 
         } catch (ObfuscatorException exception) {
