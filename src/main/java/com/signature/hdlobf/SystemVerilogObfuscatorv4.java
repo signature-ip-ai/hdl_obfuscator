@@ -5,14 +5,13 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 import com.signature.hdlobf.generated.IDMapLexer;
 import com.signature.hdlobf.generated.IDMapLoader;
 import com.signature.hdlobf.systemverilog.SystemVerilogLexer;
 
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -29,8 +28,7 @@ public class SystemVerilogObfuscatorv4 {
 
             final var mapFileOutputStream = new DataOutputStream(new FileOutputStream(mapFile, true));
 
-            final var inputFileCharStream = CharStreams.fromStream(new FileInputStream(inFile));
-            final var lexer = new SystemVerilogLexer(inputFileCharStream);
+            final var inFileStream = new FileInputStream(inFile);
 
             final var outputfile = new File(outFile);
             if (outputfile.exists()) {
@@ -39,7 +37,7 @@ public class SystemVerilogObfuscatorv4 {
             outputfile.createNewFile();
             final var outFileStream = new FileOutputStream(outFile);
 
-            return new SystemVerilogObfuscatorv4(obfHMap, mapFileOutputStream, lexer, outFileStream);
+            return new SystemVerilogObfuscatorv4(obfHMap, mapFileOutputStream, inFileStream, outFileStream);
 
         } catch (Exception exception) {
             throw new ObfuscatorException(
@@ -48,68 +46,105 @@ public class SystemVerilogObfuscatorv4 {
     }
 
     private SystemVerilogObfuscatorv4(final HashMap<String, String> mapFile, final DataOutputStream mapfileOutputStream,
-            final SystemVerilogLexer lexer,
+            final FileInputStream inFileStream,
             final FileOutputStream outFileStream) {
         this.mapFile = mapFile;
         this.mapfileOutputStream = mapfileOutputStream;
-        this.lexer = lexer;
+        this.inFileStream = inFileStream;
         this.outFileStream = outFileStream;
     }
 
     public void generateObfuscatedFile() throws ObfuscatorException {
         try {
-            final var tokenStream = new CommonTokenStream(this.lexer);
-            tokenStream.fill();
-            final List<Token> tokens = tokenStream.getTokens();
+            final var lexer = getLexerFromStream(this.inFileStream);
+            var token = lexer.nextToken();
 
-            for (final var token : tokens) {
-                var outputString = token.getText();
+            do {
+                switch (token.getType()) {
+                    case SystemVerilogLexer.SIMPLE_IDENTIFIER: {
+                        final var outputString = processSimpleIndentifier(token.getText());
+                        this.outFileStream.write(outputString.getBytes());
+                        break;
+                    }
 
-                if (SystemVerilogLexer.SIMPLE_IDENTIFIER == token.getType()) {
-                    if (this.mapFile.containsKey(outputString)) {
-                        final var newOutputString = this.mapFile.get(outputString);
-                        System.out.print("Value of ID: " + outputString + "\t\trenamed to: " + newOutputString);
-                        outputString = newOutputString;
+                    case SystemVerilogLexer.SOURCE_TEXT: {
+                        final var subLexer = getLexerFromString(token.getText());
+                        final var tokenStream = new CommonTokenStream(subLexer);
+                        tokenStream.fill();
+                        for (final var subToken : tokenStream.getTokens()) {
+                            String outputString = subToken.getText();
+                            if (SystemVerilogLexer.EOF == subToken.getType()) {
+                                break;
+                            }
 
-                    } else {
-                        final var hashString = "ID_S_" + HashFunctions.hash1(outputString) + "_"
-                                + HashFunctions.hash2(outputString) + "_E";
-                        this.mapFile.put(outputString, hashString);
-                        this.mapfileOutputStream.writeBytes(outputString + "=" + hashString + "\n");
-                        System.out.print("Value of ID: " + outputString + "\t\trenamed to : " + hashString
-                                + " added in hash map");
-                        outputString = hashString;
+                            if (SystemVerilogLexer.SIMPLE_IDENTIFIER == subToken.getType()) {
+                                outputString = processSimpleIndentifier(outputString);
+                            }
+                            this.outFileStream.write(outputString.getBytes());
+                        }
+                        break;
+                    }
+
+                    case SystemVerilogLexer.BLOCK_COMMENT:
+                    case SystemVerilogLexer.LINE_COMMENT: {
+                        final var outputString = "";
+                        this.outFileStream.write(outputString.getBytes());
+                        break;
+                    }
+
+                    case SystemVerilogLexer.PRAGMA_DIRECTIVE: {
+                        final var outputString = "\n" + token.getText() + "\n";
+                        this.outFileStream.write(outputString.getBytes());
+                        break;
+                    }
+
+                    default: {
+                        this.outFileStream.write(token.getText().getBytes());
+                        break;
                     }
                 }
 
-                else if ((SystemVerilogLexer.LINE_COMMENT == token.getType()) ||
-                        (SystemVerilogLexer.BLOCK_COMMENT == token.getType()) ||
-                        (SystemVerilogLexer.WHITE_SPACE == token.getType())) {
-                    outputString = " ";
-                }
-
-                else if (SystemVerilogLexer.PRAGMA_DIRECTIVE == token.getType()) {
-                    outputString = "\n" + outputString + "\n";
-                }
-
-                else if (SystemVerilogLexer.EOF == token.getType()) {
-                    break;
-                }
-
-                this.outFileStream.write(outputString.getBytes());
-            }
+                token = lexer.nextToken();
+            } while (SystemVerilogLexer.EOF != token.getType());
 
             this.mapfileOutputStream.close();
             this.outFileStream.close();
 
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new ObfuscatorException(
                     "Unable to execute SystemVerilogObfuscatorv4: " + exception.getMessage());
         }
     }
 
+    private SystemVerilogLexer getLexerFromStream(final FileInputStream instream) throws IOException {
+        final var charStream = CharStreams.fromStream(instream);
+        final var lexer = new SystemVerilogLexer(charStream);
+        return lexer;
+    }
+
+    private SystemVerilogLexer getLexerFromString(final String string) throws IOException {
+        final var charStream = CharStreams.fromString(string);
+        final var lexer = new SystemVerilogLexer(charStream);
+        return lexer;
+    }
+
+    private final String processSimpleIndentifier(final String tokenText) throws IOException {
+        if (this.mapFile.containsKey(tokenText)) {
+            final var newOutputString = this.mapFile.get(tokenText);
+            return newOutputString;
+
+        } else {
+            final var hashString = "ID_S_" + HashFunctions.hash1(tokenText) + "_"
+                    + HashFunctions.hash2(tokenText) + "_E";
+            this.mapFile.put(tokenText, hashString);
+            this.mapfileOutputStream.writeBytes(tokenText + "=" + hashString + "\n");
+            return hashString;
+        }
+    }
+
     private final HashMap<String, String> mapFile;
     private final DataOutputStream mapfileOutputStream;
-    private final SystemVerilogLexer lexer;
+    private final FileInputStream inFileStream;
     private final FileOutputStream outFileStream;
 }
