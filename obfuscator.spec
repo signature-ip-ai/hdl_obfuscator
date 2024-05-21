@@ -1,41 +1,8 @@
 #!/bin/env python3
 # -*- mode: python ; coding: utf-8 -*-
-import os
-import subprocess
-
-def _generateGrammarFiles(grammarFilePath:str) -> None:
-    targetPath = os.path.join('src','systemverilog')
-    command = {f'antlr4 -Dlanguage=Python3 {os.path.abspath(grammarFilePath)} -o {targetPath}'}
-    print(f'Generating ANTLR4.13.1 grammar files for: {grammarFilePath} at {targetPath}')
-    subprocess.run(command, shell = True, check = True)
-
-def _getInternalResourcePaths(dirPath:str) -> list:
-    filePaths = list()
-    for root, _, files in os.walk(dirPath):
-        for file in files:
-            if os.path.splitext(file)[1] == '.g4':
-                newPath = os.path.relpath(os.path.join(root, os.path.dirname(file), file), os.getcwd())
-                if newPath not in filePaths:
-                    filePaths.append(newPath)
-                    print(f'Adding {newPath} to grammar list')
-
-    return filePaths
-
-def _processGrammarDir(internalDirList:list) -> None:
-    for dir in internalDirList:
-        for path in _getInternalResourcePaths(dir):
-            _generateGrammarFiles(path)
-
-
 block_cipher = None
 
-internal_resources = [
-    'grammar'
-]
-
-_processGrammarDir(internal_resources)
-
-a = Analysis(['src/obfuscator.py'],
+a = Analysis(['src/Obfuscator.py'],
              pathex=['src'],
              binaries=[],
              datas=[],
