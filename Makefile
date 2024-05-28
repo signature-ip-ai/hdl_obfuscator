@@ -6,7 +6,7 @@ all: generate
 	@pyinstaller obfuscator.spec
 
 clean:
-	@rm -rf build/obfuscator dist
+	@rm -rf build/obfuscator build/systemverilog_obfuscator.egg-info dist
 
 generate:
 	@pip3 install -r requirements.txt --user
@@ -16,3 +16,8 @@ generate:
 		antlr4 -Dlanguage=Python3 $$file -o $(TARGET_DIR); \
 	done
 	@echo "Generation complete."
+
+package: clean
+	@pip3 install sdist
+	@pip3 install wheel
+	@python setup.py sdist bdist_wheel
