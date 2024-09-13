@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project]
+name = "hdl_obfuscator"
+version = "1.0"
+authors = [
+  { name="Signature IP" },
+]
+description = "Tool for Obfuscating HDL files"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    'antlr4-python3-runtime == 4.13.1',
+    'antlr4-tools == 0.2.1'
+]
+
+[project.scripts]
+hdl_obfuscate = "hdl_obfuscator:obfuscate"
+
+[project.urls]
+Homepage = "https://github.com/signature-ip-ai/hdl_obfuscator"
