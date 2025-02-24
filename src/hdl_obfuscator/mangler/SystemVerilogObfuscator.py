@@ -11,71 +11,71 @@ from . import HashFunctions
 from .systemverilog.SystemVerilogLexer import SystemVerilogLexer
 
 class SystemVerilogObfuscator:
-    def __init__(self,mapFile):
-        self.mapFile = mapFile
-        self.mapFileOutputStream = {}
+    def __init__(self,map_file):
+        self._map_file = map_file
+        self._map_file_output_stream = {}
         self._populateMapDict()
 
     def _populateMapDict(self) -> None:
-        with open(self.mapFile, "r", encoding="utf-8") as mapFileDict:
-            for line in mapFileDict:
+        with open(self._map_file, "r", encoding="utf-8") as map_file_dict:
+            for line in map_file_dict:
                 key, value = line.strip().split("=")
-                self.mapFileOutputStream[key] = value
+                self._map_file_output_stream[key] = value
 
-    def mangle(self,inFile,outFile) -> None:
+    def mangle(self,in_file,out_file) -> None:
         try:
-            print(f"Obfuscating: {inFile}")
-            lexer = self._getLexerFromStream(inFile)
+            print(f"Obfuscating: {in_file}")
+            lexer = self._get_lexer_from_stream(in_file)
             token = lexer.nextToken()
 
-            with open(outFile, "w", encoding="utf-8") as targetOutFile:
+            with open(out_file, "w", encoding="utf-8") as target_out_file:
                 while token.type != Token.EOF:
                     if token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER:
-                        outputString = self._processSimpleIdentifier(token.text)
-                        targetOutFile.write(outputString)
+                        output_string = self.__process_simple_identifier(token.text)
+                        target_out_file.write(output_string)
                     elif token.type == SystemVerilogLexer.SOURCE_TEXT:
-                        subLexer = self._getLexerFromString(token.text)
-                        tokenStream = CommonTokenStream(subLexer)
-                        tokenStream.fill()
-                        for subToken in tokenStream.tokens:
-                            if subToken.text != "<EOF>":
-                                outputString = subToken.text
-                                if subToken.type == SystemVerilogLexer.SIMPLE_IDENTIFIER:
-                                    outputString = self._processSimpleIdentifier(outputString)
-                                targetOutFile.write(outputString)
+                        sub_lexer = self._get_lexer_from_string(token.text)
+                        token_stream = CommonTokenStream(sub_lexer)
+                        token_stream.fill()
+                        for sub_token in token_stream.tokens:
+                            if sub_token.text != "<EOF>":
+                                output_string = sub_token.text
+                                if sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER:
+                                    output_string = self.__process_simple_identifier(output_string)
+                                target_out_file.write(output_string)
                     elif token.type in [SystemVerilogLexer.BLOCK_COMMENT,SystemVerilogLexer.LINE_COMMENT,]:
-                        outputString = ""
-                        targetOutFile.write(outputString)
+                        output_string = ""
+                        target_out_file.write(output_string)
                     elif token.type == SystemVerilogLexer.PRAGMA_DIRECTIVE:
-                        outputString = "\n" + token.text + "\n"
-                        targetOutFile.write(outputString)
+                        output_string = "\n" + token.text + "\n"
+                        target_out_file.write(output_string)
                     else:
-                        targetOutFile.write(token.text)
+                        target_out_file.write(token.text)
 
                     token = lexer.nextToken()
         except Exception as ex:
             raise ObfuscatorException(str(ex)) from ex
 
-    def unMangle(self,inFile,outFile) -> None:
+    def unMangle(self,in_file,out_file) -> None:
         pass
 
-    def _getLexerFromStream(self, inStream: str) -> SystemVerilogLexer:
+    def _get_lexer_from_stream(self, inStream: str) -> SystemVerilogLexer:
         charStream = FileStream(inStream, encoding="utf-8")
         lexer = SystemVerilogLexer(charStream)
         return lexer
 
-    def _getLexerFromString(self, inString: str) -> SystemVerilogLexer:
+    def _get_lexer_from_string(self, inString: str) -> SystemVerilogLexer:
         charStream = InputStream(inString)
         lexer = SystemVerilogLexer(charStream)
         return lexer
 
-    def _processSimpleIdentifier(self, tokenText: str) -> str:
-        if tokenText in self.mapFileOutputStream:
-            newOutputString = self.mapFileOutputStream[tokenText]
+    def __process_simple_identifier(self, tokenText: str) -> str:
+        if tokenText in self._map_file_output_stream:
+            newOutputString = self._map_file_output_stream[tokenText]
             return newOutputString
         else:
             hashString = ("ID_S_" + HashFunctions.hash1(tokenText) + "_" + HashFunctions.hash2(tokenText) + "_E")
-            self.mapFileOutputStream[tokenText] = hashString
-            with open(self.mapFile, "a", encoding="utf-8") as mapFileOutput:
+            self._map_file_output_stream[tokenText] = hashString
+            with open(self._map_file, "a", encoding="utf-8") as mapFileOutput:
                 mapFileOutput.write(tokenText + "=" + hashString + "\n")
             return hashString
