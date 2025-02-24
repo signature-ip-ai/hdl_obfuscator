@@ -5,6 +5,7 @@ import os
 import sys
 from .SystemVerilogObfuscator import SystemVerilogObfuscator
 from .ModuleWalker import ModuleWalker
+from .FileListVisitor import FileListVisitor
 
 
 def main():
@@ -38,6 +39,13 @@ def main():
     if args.topModule is not None:
         walker = ModuleWalker(args.topModule)
         mapFile = walker.generateMapFile(args.mapFile)
+    else:
+        if not os.path.exists(mapFile):
+            print(f"Map file '{mapFile}' not found. Creating default map file.")
+        try:
+            open(mapFile, "w").close()
+        except Exception as e:
+            sys.exit(f"Error creating map file: {e}")
 
     if args.fileList and (args.inputFile or args.outputFile):
         parser.error(
@@ -47,13 +55,17 @@ def main():
     try:
         if mangle:
             if args.fileList:
-                for source, target in _walkFileTree(args.fileList):
+                visitor = FileListVisitor(args.fileList)
+                visitor.parse()
+                for source, target in visitor.get_source_files():
                     SystemVerilogObfuscator(mapFile).mangle(source, target)
             else:
                 SystemVerilogObfuscator(mapFile).mangle(args.inputFile, args.outputFile)
         elif unmangle:
             if args.fileList:
-                for source, target in _walkFileTree(args.fileList):
+                visitor = FileListVisitor(args.fileList)
+                visitor.parse()
+                for source, target in visitor.get_source_files():
                     SystemVerilogObfuscator(mapFile).unMangle(source, target)
             else:
                 SystemVerilogObfuscator(mapFile).unMangle(
@@ -61,16 +73,6 @@ def main():
                 )
     except Exception as ex:
         sys.exit(str(ex))
-
-
-def _walkFileTree(fileList: str) -> set:
-    filePairs = set()
-    with open(fileList, "r", encoding="utf-8") as obfuscationList:
-        for line in obfuscationList:
-            file = os.path.expandvars(line.strip())
-            filePairs.add((file, file))
-
-    return filePairs
 
 
 if __name__ == "__main__":
