@@ -7,7 +7,7 @@ where = ["src"]
 
 [project]
 name = "hdl_obfuscator"
-version = "1.0"
+version = "1.2"
 authors = [
   { name="Signature IP" },
 ]

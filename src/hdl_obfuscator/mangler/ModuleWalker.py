@@ -11,9 +11,10 @@ class ModuleWalker:
         self._populateExclusionList()
 
     def generateMapFile(self, mapFilePath) -> str:
-        with open(mapFilePath, "a+", encoding="utf-8") as map:
-            for item in sorted(self.exclusionList):
-                map.write(f"{item}={item}\n")
+        with open(mapFilePath, "a", encoding="utf-8") as map:
+            for item in self.exclusionList:
+                if "=" not in item:
+                    map.write(f"{item}={item}\n")
 
         return os.path.abspath(mapFilePath)
 
@@ -39,7 +40,6 @@ class ModuleWalker:
                     continue
 
     def _isTopModule(self, filename) -> bool:
-        print(filename)
         if os.path.basename(filename) in config.rtl_top_modules:
             return True
         return False

@@ -43,7 +43,7 @@ def main():
         if not os.path.exists(mapFile):
             print(f"Map file '{mapFile}' not found. Creating default map file.")
         try:
-            open(mapFile, "w").close()
+            open(mapFile, "a").close()
         except Exception as e:
             sys.exit(f"Error creating map file: {e}")
 
@@ -57,16 +57,16 @@ def main():
             if args.fileList:
                 visitor = FileListVisitor(args.fileList)
                 visitor.parse()
-                for source, target in visitor.get_source_files():
-                    SystemVerilogObfuscator(mapFile).mangle(source, target)
+                for file in visitor.get_source_files():
+                    SystemVerilogObfuscator(mapFile).mangle(file, file)
             else:
                 SystemVerilogObfuscator(mapFile).mangle(args.inputFile, args.outputFile)
         elif unmangle:
             if args.fileList:
                 visitor = FileListVisitor(args.fileList)
                 visitor.parse()
-                for source, target in visitor.get_source_files():
-                    SystemVerilogObfuscator(mapFile).unMangle(source, target)
+                for file in visitor.get_source_files():
+                    SystemVerilogObfuscator(mapFile).unMangle(file, file)
             else:
                 SystemVerilogObfuscator(mapFile).unMangle(
                     args.inputFile, args.outputFile
