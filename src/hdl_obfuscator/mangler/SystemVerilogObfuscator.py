@@ -39,14 +39,16 @@ class SystemVerilogObfuscator:
                     if token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER:
                         output_string = self.__process_simple_identifier(token.text)
                         target_out_file.write(output_string)
-                    elif token.type in [SystemVerilogLexer.SOURCE_TEXT,SystemVerilogLexer.MACRO_NAME,SystemVerilogLexer.MACRO_TEXT]:
+                    elif token.type in [SystemVerilogLexer.SOURCE_TEXT,SystemVerilogLexer.MACRO_TEXT]:
                         sub_lexer = self._get_lexer_from_string(token.text)
                         token_stream = CommonTokenStream(sub_lexer)
                         token_stream.fill()
                         for sub_token in token_stream.tokens:
                             if sub_token.text != "<EOF>":
                                 output_string = sub_token.text
-                                if sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER:
+                                macros_identifier = ["E","CL", "CL_NUM", "E_NUM", "I_NUM", "NAME", "_protocol_if", "e"]
+                                if (sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER and
+                                    sub_token.text not in macros_identifier):
                                     output_string = self.__process_simple_identifier(output_string)
                                 target_out_file.write(output_string)
                     elif token.type in [SystemVerilogLexer.BLOCK_COMMENT,SystemVerilogLexer.LINE_COMMENT,]:
