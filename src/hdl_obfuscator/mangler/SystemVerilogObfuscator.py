@@ -39,7 +39,7 @@ class SystemVerilogObfuscator:
                     if token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER:
                         output_string = self.__process_simple_identifier(token.text)
                         target_out_file.write(output_string)
-                    elif token.type == SystemVerilogLexer.SOURCE_TEXT:
+                    elif token.type in [SystemVerilogLexer.SOURCE_TEXT,SystemVerilogLexer.MACRO_NAME,SystemVerilogLexer.MACRO_TEXT]:
                         sub_lexer = self._get_lexer_from_string(token.text)
                         token_stream = CommonTokenStream(sub_lexer)
                         token_stream.fill()
