@@ -46,10 +46,20 @@ class SystemVerilogObfuscator:
                         for sub_token in token_stream.tokens:
                             if sub_token.text != "<EOF>":
                                 output_string = sub_token.text
-                                macros_identifier = ["E","CL", "CL_NUM", "E_NUM", "I_NUM", "NAME", "_protocol_if", "e"]
+                                has_leading_underscore = output_string.startswith("_")
+                                has_trailing_e = output_string.endswith("_e")
+                                if has_leading_underscore:
+                                    output_string = output_string[1:]
+                                if has_trailing_e:
+                                    output_string = output_string[:-2]
+                                MACROS_IDENTIFIER = ["E","CL", "CL_NUM", "E_NUM", "I_NUM", "NAME", "_PROTOCOL_IF"]
                                 if (sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER and
-                                    sub_token.text not in macros_identifier):
+                                    sub_token.text.upper() not in MACROS_IDENTIFIER):
                                     output_string = self.__process_simple_identifier(output_string)
+                                    if has_leading_underscore:
+                                        output_string = "_" + output_string
+                                    if has_trailing_e:
+                                        output_string = output_string + "_e"
                                 target_out_file.write(output_string)
                     elif token.type in [SystemVerilogLexer.BLOCK_COMMENT,SystemVerilogLexer.LINE_COMMENT,]:
                         output_string = ""
