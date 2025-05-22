@@ -10,6 +10,7 @@ from .ObfuscatorException import ObfuscatorException
 from . import HashFunctions
 
 from .systemverilog.SystemVerilogLexer import SystemVerilogLexer
+from .systemverilog.SystemVerilogMacroLexer import SystemVerilogMacroLexer
 
 class SystemVerilogObfuscator:
     def __init__(self,map_file):
@@ -52,14 +53,14 @@ class SystemVerilogObfuscator:
                                     output_string = output_string[1:]
                                 if has_trailing_e:
                                     output_string = output_string[:-2]
-                                MACROS_IDENTIFIER = ["E","CL", "CL_NUM", "E_NUM", "I_NUM", "NAME", "_PROTOCOL_IF"]
+                                pid_lexer = (self._get_lexer_from_macro(output_string)).nextToken()
                                 if (sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER and
-                                    sub_token.text.upper() not in MACROS_IDENTIFIER):
+                                    pid_lexer.type != SystemVerilogMacroLexer.PROTECTED_MACRO):
                                     output_string = self.__process_simple_identifier(output_string)
-                                    if has_leading_underscore:
-                                        output_string = "_" + output_string
-                                    if has_trailing_e:
-                                        output_string = output_string + "_e"
+                                if has_leading_underscore:
+                                    output_string = "_" + output_string
+                                if has_trailing_e:
+                                    output_string = output_string + "_e"
                                 target_out_file.write(output_string)
                     elif token.type in [SystemVerilogLexer.BLOCK_COMMENT,SystemVerilogLexer.LINE_COMMENT,]:
                         output_string = ""
@@ -85,6 +86,11 @@ class SystemVerilogObfuscator:
     def _get_lexer_from_string(self, inString: str) -> SystemVerilogLexer:
         charStream = InputStream(inString)
         lexer = SystemVerilogLexer(charStream)
+        return lexer
+    
+    def _get_lexer_from_macro(self, inString: str) -> SystemVerilogMacroLexer:
+        charStream = InputStream(inString)
+        lexer = SystemVerilogMacroLexer(charStream)
         return lexer
 
     def __process_simple_identifier(self, tokenText: str) -> str:
