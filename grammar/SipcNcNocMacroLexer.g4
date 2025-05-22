@@ -1,5 +1,5 @@
 /**
- * SystemVerilogProtectedIdentifiers.g4
+ * SipcNcNocMacroLexer.g4
  * 
  * This grammar defines protected identifiers that should NOT be obfuscated
  * during code processing. These are typically:
@@ -13,17 +13,19 @@
  * Note: These are treated separately from regular SystemVerilog keywords
  * to maintain readability in obfuscated output where needed.
  */
-lexer grammar SystemVerilogMacroLexer;
+lexer grammar SipcNcNocMacroLexer;
 
 PROTECTED_MACRO: 
-    'E'
-  | 'CL'
+    'CL'
   | 'CL_NUM'
   | 'E_NUM'
   | 'I_NUM'
   | 'NAME'
   | 'protocol_if'
+  | 'E'
   | 'e'
+  | 'I'
+  | 'i'
   // Add new protected identifiers below this line, follow the same pipe-separated format
   ;
 
