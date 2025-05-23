@@ -59,9 +59,10 @@ class SystemVerilogObfuscator:
                                 output_string = sub_token.text
                                 has_leading_underscore = output_string.startswith("_")
                                 has_trailing_e = output_string.endswith("_e")
+                                has_trailing_i = output_string.endswith("_i")
                                 if has_leading_underscore:
                                     output_string = output_string[1:]
-                                if has_trailing_e:
+                                if has_trailing_e or has_trailing_i:
                                     output_string = output_string[:-2]
                                 pid_lexer = (self._get_lexer_from_macro(output_string)).nextToken()
                                 if (sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER and
@@ -71,6 +72,8 @@ class SystemVerilogObfuscator:
                                     output_string = "_" + output_string
                                 if has_trailing_e:
                                     output_string = output_string + "_e"
+                                elif has_trailing_i:
+                                    output_string = output_string + "_i"
                                 target_out_file.write(output_string)
                     elif token.type in [SystemVerilogLexer.BLOCK_COMMENT, SystemVerilogLexer.LINE_COMMENT]:
                         output_string = ""
