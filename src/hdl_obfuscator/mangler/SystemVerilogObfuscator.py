@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import sys
+import re
 from antlr4 import CommonTokenStream
 from antlr4 import FileStream
 from antlr4 import InputStream
@@ -57,23 +58,16 @@ class SystemVerilogObfuscator:
                         for sub_token in token_stream.tokens:
                             if sub_token.text != "<EOF>":
                                 output_string = sub_token.text
-                                has_leading_underscore = output_string.startswith("_")
-                                has_trailing_e = output_string.endswith("_e")
-                                has_trailing_i = output_string.endswith("_i")
-                                if has_leading_underscore:
-                                    output_string = output_string[1:]
-                                if has_trailing_e or has_trailing_i:
-                                    output_string = output_string[:-2]
-                                pid_lexer = (self._get_lexer_from_macro(output_string)).nextToken()
+                                match = re.match(r'^(_)?(.*?)(_[a-z])?$', output_string)
+                                if match:
+                                    leading_underscore = match.group(1) or ""
+                                    output_string = match.group(2)
+                                    trailing = match.group(3) or ""
+                                macro_token = (self._get_lexer_from_macro(output_string)).nextToken()
                                 if (sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER and
-                                    pid_lexer.type != SipcNcNocMacroLexer.PROTECTED_MACRO):
+                                    macro_token.type != SipcNcNocMacroLexer.PROTECTED_MACRO):
                                     output_string = self.__process_simple_identifier(output_string)
-                                if has_leading_underscore:
-                                    output_string = "_" + output_string
-                                if has_trailing_e:
-                                    output_string = output_string + "_e"
-                                elif has_trailing_i:
-                                    output_string = output_string + "_i"
+                                output_string = f"{leading_underscore}{output_string}{trailing}"
                                 target_out_file.write(output_string)
                     elif token.type in [SystemVerilogLexer.BLOCK_COMMENT, SystemVerilogLexer.LINE_COMMENT]:
                         output_string = ""
