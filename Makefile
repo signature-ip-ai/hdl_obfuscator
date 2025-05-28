@@ -7,19 +7,20 @@ ACTIVATE_VENV = source $(VENV_DIR)/bin/activate
 .ONESHELL:
 
 
-build: $(VENV_DIR)
-	@ $(ACTIVATE_VENV)
+build: generate
 	@ pip3 install --upgrade build
 	@ python3 -m build
 
 
-install: $(VENV_DIR)
-	@ $(ACTIVATE_VENV)
+install: uninstall build
 	@ pip3 install dist/*.whl
 
 
-generate: $(VENV_DIR)
-	@ $(ACTIVATE_VENV)
+uninstall:
+	@ pip3 uninstall -y hdl_obfuscator
+
+
+generate:
 	@ pip3 install -r requirements.txt
 	@ echo "Generating ANTLR4 files..."
 	@ for file in $(GRAMMAR_DIR)/*.g4; do \
@@ -35,4 +36,4 @@ $(VENV_DIR):
 
 
 clean:
-	@ rm -rf src/hdl_obfuscator.egg-info dist $(VENV_DIR)
+	@ rm -rf src/hdl_obfuscator.egg-info dist
