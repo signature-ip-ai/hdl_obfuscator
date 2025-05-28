@@ -4,3 +4,4 @@
 **/dist/
 **/.pyvenv
 **/hdl_obfuscator.egg-info/
+**/systemverilog/
