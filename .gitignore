@@ -4,4 +4,5 @@
 **/dist/
 **/.pyvenv
 **/hdl_obfuscator.egg-info/
-**/systemverilog/
+src/hdl_obfuscator/mangler/systemverilog/*
+!src/hdl_obfuscator/mangler/systemverilog/__init__.py
