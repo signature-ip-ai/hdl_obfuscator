@@ -1,0 +1,18 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8",
+    },
+    "files.eol": "\n",
+    "pylint.args": [
+        "--disable=C0111,C0103,W1203,W1201,C0301",
+        "--max-line-length=110"
+    ],
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}/src/hdl_obfuscator/mangler",
+        "${workspaceFolder}/src/hdl_obfuscator/demangler"
+    ],
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/src/hdl_obfuscator/mangler",
+        "${workspaceFolder}/src/hdl_obfuscator/demangler"
+    ]
+}
