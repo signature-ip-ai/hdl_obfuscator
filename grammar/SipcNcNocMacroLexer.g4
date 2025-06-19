@@ -26,6 +26,10 @@ PROTECTED_MACRO:
   | 'e'
   | 'I'
   | 'i'
+  | 'ifdef'
+  | 'ifndef'
+  | 'elsif'
+  | 'endif'
   // Add new protected identifiers below this line, follow the same pipe-separated format
   ;
 
