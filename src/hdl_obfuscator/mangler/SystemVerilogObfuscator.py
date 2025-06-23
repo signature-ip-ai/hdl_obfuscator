@@ -58,7 +58,7 @@ class SystemVerilogObfuscator:
                         for sub_token in token_stream.tokens:
                             if sub_token.text != "<EOF>":
                                 output_string = sub_token.text
-                                match = re.match(r'^(_)?([A-Z][0-9]+_)?(.*?)(_[a-z])?$', output_string)
+                                match = re.match(r'^(_)?([A-Z]+[0-9]+_)?(.*?)(_[a-z])?$', output_string)
                                 if match:
                                     leading_underscore = match.group(1) or ""
                                     prefix_index = match.group(2) or ""
