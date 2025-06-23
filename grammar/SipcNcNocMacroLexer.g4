@@ -30,7 +30,17 @@ PROTECTED_MACRO:
   | 'ifndef'
   | 'elsif'
   | 'endif'
+  | MACRO_TITLE
   // Add new protected identifiers below this line, follow the same pipe-separated format
+  ;
+  
+MACRO_TITLE:
+    'CONNECT_'[a-zA-Z0-9_$]*
+  | 'DEFINE_'[a-zA-Z0-9_$]*
+  | 'GEN_'[a-zA-Z0-9_$]*
+  | 'GENERATE_'[a-zA-Z0-9_$]*
+  | 'INST_'[a-zA-Z0-9_$]*
+  | 'SET_'[a-zA-Z0-9_$]*
   ;
 
 NON_PROTECTED_MACRO: [a-zA-Z_][a-zA-Z0-9_$]* ;
