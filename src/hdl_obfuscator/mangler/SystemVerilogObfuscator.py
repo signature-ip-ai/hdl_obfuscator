@@ -58,17 +58,17 @@ class SystemVerilogObfuscator:
                         for sub_token in token_stream.tokens:
                             if sub_token.text != "<EOF>":
                                 output_string = sub_token.text
-                                match = re.match(r'^(_)?([A-Z]+[0-9]+_)?(.*?)(_[a-z])?$', output_string)
+                                match = re.match(r'^(_)?([A-Za-z][0-9]+_)?(.*?)(_[a-z][0-9]*)?$', output_string)
                                 if match:
                                     leading_underscore = match.group(1) or ""
                                     prefix_index = match.group(2) or ""
                                     output_string = match.group(3)
-                                    trailing = match.group(4) or ""
+                                    suffix_index = match.group(4) or ""
                                 macro_token = (self._get_lexer_from_macro(output_string)).nextToken()
                                 if (sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER and
                                     macro_token.type != SipcNcNocMacroLexer.PROTECTED_MACRO):
                                     output_string = self.__process_simple_identifier(output_string)
-                                output_string = f"{leading_underscore}{prefix_index}{output_string}{trailing}"
+                                output_string = f"{leading_underscore}{prefix_index}{output_string}{suffix_index}"
                                 target_out_file.write(output_string)
                     elif token.type in [SystemVerilogLexer.BLOCK_COMMENT, SystemVerilogLexer.LINE_COMMENT]:
                         output_string = ""
