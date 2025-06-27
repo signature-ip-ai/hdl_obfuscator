@@ -30,6 +30,9 @@ PROTECTED_MACRO:
   | 'ifndef'
   | 'elsif'
   | 'endif'
+  | 'define'
+  | 'SUBTOP'
+  | 'SUB_NUM'
   | MACRO_TITLE
   // Add new protected identifiers below this line, follow the same pipe-separated format
   ;
@@ -41,6 +44,7 @@ MACRO_TITLE:
   | 'GENERATE_'[a-zA-Z0-9_$]*
   | 'INST_'[a-zA-Z0-9_$]*
   | 'SET_'[a-zA-Z0-9_$]*
+  | 'MODULE_'[a-zA-Z0-9_$]*
   ;
 
 NON_PROTECTED_MACRO: [a-zA-Z_][a-zA-Z0-9_$]* ;
