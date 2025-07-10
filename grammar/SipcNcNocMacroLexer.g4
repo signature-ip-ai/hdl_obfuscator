@@ -22,6 +22,8 @@ PROTECTED_MACRO:
   | 'I_NUM'
   | 'CL_NUM_E'
   | 'CL_NUM_I'
+  | 'CL_NUM_FROM'
+  | 'CL_NUM_TO'
   | 'NUM'
   | 'IDX'
   | 'PREFIX'
