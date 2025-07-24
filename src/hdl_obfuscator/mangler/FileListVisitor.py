@@ -1,4 +1,6 @@
 #!/bin/env python3
+
+import logging
 import os
 import re
 from . import config
@@ -21,13 +23,13 @@ class FileListVisitor:
                 line = line.rstrip('\n')
                 line = line.strip()
                 line = os.path.expandvars(line)
-                print(f"Reading path: {line}")
+                logging.debug(f"Reading path: {line}")
 
                 if self._is_line_commented(line):
                     continue
 
                 if self._is_verilog_file_path(line):
-                    print(f"Using Verilog file: {line}")
+                    logging.debug(f"Using Verilog file: {line}")
                     line = os.path.normpath(line)
                     if line:
                         source_files.add((line))
@@ -37,20 +39,20 @@ class FileListVisitor:
                     incdir_files_path = os.path.normpath(incdir_line)
 
                     if not os.path.exists(incdir_files_path):
-                        print(f"Directory not found: {incdir_files_path}")
+                        logging.debug(f"Directory not found: {incdir_files_path}")
                         continue
 
                     for root, _, files in os.walk(incdir_files_path):
                         for file in files:
                             file_path = os.path.join(root, file)
-                            print(f"Adding file: {file_path}")
+                            logging.debug(f"Adding file: {file_path}")
                             source_files.add((file_path))
 
                 elif self._is_file_list_file_path(line):
                     inner_file_list_path = os.path.normpath(self._get_file_list_from_file_path(line))
 
                     if not os.path.exists(inner_file_list_path):
-                        print(f"File list not found: {inner_file_list_path}")
+                        logging.debug(f"File list not found: {inner_file_list_path}")
                         continue
 
                     inner_source_files = self._read_file_list(inner_file_list_path)

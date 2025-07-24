@@ -1,5 +1,6 @@
 #!/bin/env python3
 
+import logging
 import argparse
 import os
 import sys
@@ -41,10 +42,12 @@ def main():
         mapFile = walker.generateMapFile(args.mapFile)
     else:
         if not os.path.exists(mapFile):
-            print(f"Map file '{mapFile}' not found. Creating default map file.")
+            logging.warning(f"Map file '{mapFile}' not found. Creating default map file.")
+
         try:
-            open(mapFile, "a").close()
-        except Exception as e:
+            open(mapFile, "a", encoding='utf-8').close()
+
+        except Exception as e: # pylint: disable=broad-exception-caught
             sys.exit(f"Error creating map file: {e}")
 
     if args.fileList and (args.inputFile or args.outputFile):
@@ -71,7 +74,8 @@ def main():
                 SystemVerilogObfuscator(mapFile).unMangle(
                     args.inputFile, args.outputFile
                 )
-    except Exception as ex:
+
+    except Exception as ex: # pylint: disable=broad-exception-caught
         sys.exit(str(ex))
 
 

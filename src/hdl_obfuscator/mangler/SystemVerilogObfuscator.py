@@ -1,7 +1,7 @@
 #!/bin/env python3
 
-import sys
 import re
+import logging
 from antlr4 import CommonTokenStream
 from antlr4 import FileStream
 from antlr4 import InputStream
@@ -21,18 +21,19 @@ class SystemVerilogObfuscator:
 
     def _populateMapDict(self) -> None:
         with open(self._map_file, "r", encoding="utf-8") as map_file_dict:
-                for line in map_file_dict.readlines():
-                    line = line.rstrip('\n')
-                    line = line.strip()
-                    if not line or "=" not in line:
-                        continue
-                    key, value = line.split("=")
-                    self._map_file_output_stream[key] = value
+            for line in map_file_dict.readlines():
+                line = line.rstrip('\n')
+                line = line.strip()
+                if not line or "=" not in line:
+                    continue
+
+                key, value = line.split("=")
+                self._map_file_output_stream[key] = value
 
 
     def mangle(self,in_file,out_file) -> None:
         try:
-            print(f"Obfuscating: {in_file}")
+            logging.info(f"Obfuscating: {in_file}")
             lexer = self._get_lexer_from_stream(in_file)
             token = lexer.nextToken()
 
@@ -95,7 +96,7 @@ class SystemVerilogObfuscator:
         char_stream = InputStream(input_string)
         lexer = SystemVerilogLexer(char_stream)
         return lexer
-    
+
     def _get_lexer_from_macro(self, input_string: str) -> SipcNcNocMacroLexer:
         char_stream = InputStream(input_string)
         lexer = SipcNcNocMacroLexer(char_stream)

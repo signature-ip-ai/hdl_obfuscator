@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 import os
 import re
 
@@ -11,10 +13,10 @@ class ModuleWalker:
         self._populateExclusionList()
 
     def generateMapFile(self, mapFilePath) -> str:
-        with open(mapFilePath, "a", encoding="utf-8") as map:
+        with open(mapFilePath, "a", encoding="utf-8") as map_file:
             for item in self.exclusionList:
                 if "=" not in item:
-                    map.write(f"{item}={item}\n")
+                    map_file.write(f"{item}={item}\n")
 
         return os.path.abspath(mapFilePath)
 

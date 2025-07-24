@@ -1,4 +1,7 @@
+#!/bin/env python3
+
 import re
+import logging
 
 class FileDemangler:
     def __init__(self, map_file_path):
@@ -12,8 +15,9 @@ class FileDemangler:
                 for line in map_file:
                     key, value = line.strip().split("=")
                     self.map_file_dict[value] = key
+
         except FileNotFoundError as ex:
-            print(f"Error processing map file: {ex}")
+            logging.error(f"Error processing map file: {ex}")
 
     def demangle_file(self, input_file_path: str, output_file_path: str) -> None:
         try:
@@ -23,19 +27,22 @@ class FileDemangler:
                     demangled_contents = self._demangle_string(input_contents)
                     if demangled_contents is not None:
                         output_file.write(demangled_contents)
+
         except FileNotFoundError as ex1:
-            print(f"Error processing file: {ex1}")
-        except Exception as ex2:
-            print(f"Error processing file: {ex2}")
+            logging.error(f"Error processing file: {ex1}")
+
+        except Exception as ex2: # pylint: disable=broad-exception-caught
+            logging.error(f"Error processing file: {ex2}")
 
     def _demangle_string(self, input_string: str) -> str | None:
         try:
             compiled_patterns = {re.compile(re.escape(value)): key for value, key in self.map_file_dict.items()}
             for pattern, replacement in compiled_patterns.items():
                 if pattern.search(input_string):
-                    print(f"Demangling from '{pattern.pattern}' to '{replacement}'")
+                    logging.error(f"Demangling from '{pattern.pattern}' to '{replacement}'")
                     input_string = pattern.sub(replacement, input_string)
             return input_string
-        except Exception as ex:
-            print(f"Error during string demangling: {ex}")
+
+        except Exception as ex: # pylint: disable=broad-exception-caught
+            logging.error(f"Error during string demangling: {ex}")
             return None
