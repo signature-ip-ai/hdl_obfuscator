@@ -391,13 +391,13 @@ VLMIGT   : '|->';
 VLVL     : '||';
 
 BINARY_BASE             : '\'' [sS]? [bB]       -> pushMode(BINARY_NUMBER_MODE);
-BLOCK_COMMENT           : '/*' ASCII_ANY*? '*/' -> channel(COMMENTS);
+BLOCK_COMMENT           : '/*' UNICODE_ANY*? '*/' -> channel(COMMENTS);
 DECIMAL_BASE            : '\'' [sS]? [dD]       -> pushMode(DECIMAL_NUMBER_MODE);
 ESCAPED_IDENTIFIER      : '\\' ASCII_PRINTABLE_NO_SPACE* [ \t\r\n];
 EXPONENTIAL_NUMBER      : UNSIGNED_NUMBER ( '.' UNSIGNED_NUMBER)? [eE] [+\-]? UNSIGNED_NUMBER;
 FIXED_POINT_NUMBER      : UNSIGNED_NUMBER '.' UNSIGNED_NUMBER;
 HEX_BASE                : '\'' [sS]? [hH]        -> pushMode(HEX_NUMBER_MODE);
-LINE_COMMENT            : '//' ASCII_NO_NEWLINE* -> channel(COMMENTS);
+LINE_COMMENT            : '//' UNICODE_NO_NEWLINE* -> channel(COMMENTS);
 OCTAL_BASE              : '\'' [sS]? [oO]        -> pushMode(OCTAL_NUMBER_MODE);
 SIMPLE_IDENTIFIER       : [a-zA-Z_] [a-zA-Z0-9_$]*;
 STRING_LITERAL          : '"' ( ASCII_NO_NEWLINE_QUOTE_BACKSLASH | ESC_NEWLINE | ESC_SPECIAL_CHAR)* '"';
@@ -612,6 +612,8 @@ MACRO_IDENTIFIER : IDENTIFIER -> channel(DIRECTIVES);
 NEWLINE_11       : NEWLINE    -> channel(HIDDEN), type(WHITE_SPACE), popMode;
 SPACE_TAB_10     : SPACE_TAB  -> channel(HIDDEN), type(WHITE_SPACE);
 
+fragment UNICODE_ANY        : [\u0000-\u{10FFFF}];
+fragment UNICODE_NO_NEWLINE : [\u0000-\u0009\u000b-\u000c\u000e-\u{10FFFF}];
 fragment ASCII_ANY        : [\u0000-\u007f];
 fragment ASCII_NO_NEWLINE : [\u0000-\u0009\u000b-\u000c\u000e-\u007f];
 fragment ASCII_NO_NEWLINE_QUOTE_BACKSLASH:
