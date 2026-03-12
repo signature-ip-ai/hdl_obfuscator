@@ -4,3 +4,7 @@
 **/dist/
 **/.pyvenv
 **/hdl_obfuscator.egg-info/
+.*
+!.gitignore
+*.sv
+*.dat

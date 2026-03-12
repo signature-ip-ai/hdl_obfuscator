@@ -1,4 +1,4 @@
-# Generated from /scratch/users/jramos/hdl_obf/hdl_obfuscator/grammar/SipcNcNocMacroLexer.g4 by ANTLR 4.13.2
+# Generated from /scratch/users/jseguisa/workspace/signature/obfuscator/hdl_obfuscator/grammar/SipcNcNocMacroLexer.g4 by ANTLR 4.13.2
 from antlr4 import *
 from io import StringIO
 import sys
