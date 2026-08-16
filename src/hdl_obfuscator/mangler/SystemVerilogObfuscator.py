@@ -13,6 +13,12 @@ from . import HashFunctions
 from .systemverilog.SystemVerilogLexer import SystemVerilogLexer
 from .systemverilog.SipcNcNocMacroLexer import SipcNcNocMacroLexer
 
+logging.basicConfig(
+    filename='app.log',        # File name
+    level=logging.INFO,        # Minimum log level
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
 class SystemVerilogObfuscator:
     def __init__(self,map_file):
         self._map_file = map_file
@@ -49,6 +55,12 @@ class SystemVerilogObfuscator:
                         for sub_token in token_stream.tokens:
                             if sub_token.text != "<EOF>":
                                 output_string = sub_token.text
+                                match = re.match(r'^(_)?([A-Za-z][0-9]+_)?(.*?)(_[a-z][0-9]*)?$', output_string)
+                                if match:
+                                    leading_underscore = match.group(1) or ""
+                                    prefix_index = match.group(2) or ""
+                                    output_string = match.group(3)
+                                    suffix_index = match.group(4) or ""
                                 if sub_token.type == SystemVerilogLexer.SIMPLE_IDENTIFIER:
                                     output_string = self.__process_simple_identifier(output_string)
                                 target_out_file.write(output_string)
